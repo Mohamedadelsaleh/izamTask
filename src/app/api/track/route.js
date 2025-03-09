@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
-const errorChance = 0.1;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const errorChance = process.env.NAV_ERROR_RATE || 0.1;
 
 export async function POST(request) {
   if (Math.random() <= errorChance)

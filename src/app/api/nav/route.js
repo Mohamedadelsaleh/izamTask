@@ -3,8 +3,11 @@ import { promises as fs } from "fs";
 import path from "path";
 import { defaultNavData } from "@/lib/navData";
 
+export const dynamic = 'force-dynamic'; // Needed for Vercel deployments
+export const revalidate = 0;
+
 const dataPath = path.join(process.cwd(), "nav.json");
-const errorChance = 0.1;
+const errorChance = process.env.NAV_ERROR_RATE || 0.1;
 
 export async function GET() {
   if (Math.random() <= errorChance)
