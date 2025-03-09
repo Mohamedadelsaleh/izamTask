@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { defaultNavData } from "@/lib/navData";
+import { loadNav, saveNav } from "@/lib/supabase";
 
-export const dynamic = 'force-dynamic'; // Needed for Vercel deployments
-export const revalidate = 0;
-
-const dataPath = path.join(process.cwd(), "nav.json");
+export const dynamic = "force-dynamic";
 const errorChance = process.env.NAV_ERROR_RATE || 0.1;
 
 export async function GET() {
@@ -14,9 +10,8 @@ export async function GET() {
     return new NextResponse(null, { status: 500 });
 
   try {
-    await fs.access(dataPath);
-    const data = await fs.readFile(dataPath, "utf8");
-    return NextResponse.json(JSON.parse(data));
+    const data = await loadNav();
+    return NextResponse.json(data || defaultNavData);
   } catch (error) {
     return NextResponse.json(defaultNavData);
   }
@@ -28,7 +23,7 @@ export async function POST(request) {
 
   try {
     const data = await request.json();
-    await fs.writeFile(dataPath, JSON.stringify(data));
+    await saveNav(data);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(
